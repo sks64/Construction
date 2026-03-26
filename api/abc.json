@@ -1,0 +1,18 @@
+{
+    "CUSTOMER_ID": 1,
+    "ORDER_AMOUNT": 400,
+    "ORDER_TYPE": "R",
+    "SUB_TOTAL": "400",
+    "PAYMENT_STATUS": "U",
+    "CREATED_BY": 1,
+    "orderDetails": [
+        {
+            "ITEM_ID": 1,
+            "QTY": 10
+        },
+        {
+            "ITEM_ID": 2,
+            "QTY": 5
+        }
+    ]
+}

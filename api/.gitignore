@@ -1,0 +1,21 @@
+node_modules/
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Uploaded Files
+uploads/
+tmp/
+
+# Zip files
+*.zip
+*.tar.gz
+
+# Secrets
+*-firebase-adminsdk-*.json

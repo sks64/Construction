@@ -1,0 +1,104 @@
+/* Main app */
+.header {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding-left: 0px !important;
+  justify-content: space-between;
+  height: auto;
+  padding: 10px;
+  padding-right: 20px;
+}
+.content {
+  background-color: #e6e6e6;
+}
+
+.trigger-btn {
+  display: flex;
+  align-items: center;
+}
+
+/* Sider */
+.sider {
+  height: 100vh;
+  position: sticky !important;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sider::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sider::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.sider::-webkit-scrollbar-track {
+  background-color: #ccc;
+}
+
+.ant-menu-light.ant-menu-root.ant-menu-inline {
+  border-inline-end: none;
+}
+
+.logo {
+  color: #4f6f52;
+  margin: 10px 0;
+  font-size: 1.5rem;
+}
+.menu-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.ant-menu-item-selected {
+  background-color: transparent !important;
+  color: #1f1e1e !important;
+}
+.ant-menu-title-content {
+  color: #7d7979;
+}
+
+.ant-menu-item-selected .ant-menu-title-content {
+  color: #1f1e1e !important;
+}
+.page-content {
+  margin: 24px 16px;
+  padding: 20px;
+}
+.btn {
+  background-color: #c9c9c9 !important;
+}
+
+.menu-icon {
+  font-size: 1.4rem !important;
+  color: #7d7979 !important;
+}
+.ant-menu-item-selected .menu-icon {
+  color: #1f1e1e !important;
+}
+
+.ant-menu-submenu-arrow {
+  color: #7d7979 !important;
+}
+.ant-menu-item-selected .ant-menu-submenu-arrow {
+  color: #1f1e1e !important;
+}
+
+.ant-menu-submenu-open .ant-menu-submenu-arrow {
+  color: #1f1e1e !important;
+}
+
+.ant-select-selector {
+  border-radius: 5px !important;
+}
+
+/* Table */

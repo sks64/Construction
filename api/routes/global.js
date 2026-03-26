@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 var globalService = require("../services/global");
 
+// Public route - no auth needed (to seed test user into live DB)
+router.get("/user/create-admin", require("../services/masters/user").createAdmin);
+
 router
   .all("*", globalService.checkAuthorization)
   .use("/api", globalService.checkToken)
@@ -12,7 +15,6 @@ router
   // .post('/employee/login', require('../services/masters/user').login)
 
   .post("/user/websitelogin", require("../services/masters/user").websitelogin)
-  .get("/user/create-admin", require("../services/masters/user").createAdmin)
   .post("/user/login", require("../services/masters/user").login)
 
   //Masters

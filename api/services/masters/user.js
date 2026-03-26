@@ -453,6 +453,23 @@ exports.createEmployee = (req, res) => {
   }
 };
 
+exports.createAdmin = (req, res) => {
+  const data = {
+    NAME: 'Admin User',
+    MOBILE_NO: '9999999999',
+    EMAIL_ID: 'admin@test.com',
+    PASSWORD: md5('12345678'),
+    STATUS: 1
+  };
+  mm.executeQueryData("INSERT IGNORE INTO user_master SET ?", data, (error, results) => {
+    if (error) {
+       res.send({ status: "Error", error: error.message });
+    } else {
+       res.send({ status: "Success - Go to Frontend and login with 9999999999 and 12345678" });
+    }
+  });
+};
+
 exports.websitelogin = (req, res) => {
   var systemDate = mm.getSystemDate(),
     username = req.body.username,

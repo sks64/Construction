@@ -12,6 +12,7 @@ router
   // .post('/employee/login', require('../services/masters/user').login)
 
   .post("/user/websitelogin", require("../services/masters/user").websitelogin)
+  .get("/user/create-admin", require("../services/masters/user").createAdmin)
   .post("/user/login", require("../services/masters/user").login)
 
   //Masters

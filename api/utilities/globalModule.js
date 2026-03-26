@@ -12,7 +12,7 @@ var config = {
     charset: 'UTF8_GENERAL_CI',
     timeout: 60000, // Increased timeout
     port: 3306,
-    connectionLimit: 100 // Connection pooling
+    connectionLimit: 5 // Reduced for free database compatibility
 }
 
 const pool = mysql.createPool(config);
@@ -50,24 +50,44 @@ exports.executeQueryData = (query, data, callback) => {
 exports.rollbackConnection = (connection) => {
     try {
         connection.rollback(function () {
-            connection.release(); // Release instead of end
+            if (typeof connection.release === 'function') {
+                connection.release();
+            } else {
+                connection.end();
+            }
         });
     }
     catch (error) {
         console.error(error);
-        if (connection) connection.release();
+        if (connection) {
+            if (typeof connection.release === 'function') {
+                connection.release();
+            } else {
+                connection.end();
+            }
+        }
     }
 }
 
 exports.commitConnection = (connection) => {
     try {
         connection.commit(function () {
-            connection.release(); // Release instead of end
+            if (typeof connection.release === 'function') {
+                connection.release();
+            } else {
+                connection.end();
+            }
         });
     }
     catch (error) {
         console.error(error);
-        if (connection) connection.release();
+        if (connection) {
+            if (typeof connection.release === 'function') {
+                connection.release();
+            } else {
+                connection.end();
+            }
+        }
     }
 }
 

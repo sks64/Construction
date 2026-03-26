@@ -45,7 +45,7 @@ exports.getOverDueOrders = (req, res) => {
                         logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                         res.send({
                             "code": 400,
-                            "message": "Failed to get viewCustomerMaster information."
+                            "message": "Failed to get viewCustomerMaster information: " + (error.sqlMessage || error.message)
                         });
                     }
                     else {
@@ -120,7 +120,7 @@ exports.getOrderPaymentSummary = (req, res) => {
                         logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
                         res.send({
                             "code": 400,
-                            "message": "Failed to get payment information."
+                            "message": "Failed to get payment information: " + (error.sqlMessage || error.message)
                         });
                     }
                     else {
@@ -165,7 +165,7 @@ exports.getDashboardSummaryReport = (req, res) => {
                         logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                         res.send({
                             "code": 400,
-                            "message": "Failed to get order count."
+                            "message": "Failed to get order count: " + (error.sqlMessage || error.message)
                         });
                     }
                     else {
@@ -175,7 +175,7 @@ exports.getDashboardSummaryReport = (req, res) => {
                                 logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                                 res.send({
                                     "code": 400,
-                                    "message": "Failed to get item count."
+                                    "message": "Failed to get item count: " + (error.sqlMessage || error.message)
                                 });
                             }
                             else {
@@ -185,7 +185,7 @@ exports.getDashboardSummaryReport = (req, res) => {
                                         logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                                         res.send({
                                             "code": 400,
-                                            "message": "Failed to get User Count."
+                                            "message": "Failed to get User Count: " + (error.sqlMessage || error.message)
                                         });
                                     }
                                     else {

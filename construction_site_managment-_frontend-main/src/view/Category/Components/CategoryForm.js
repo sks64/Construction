@@ -63,7 +63,7 @@ const CategoryForm = () => {
       setEdit(true);
     } else {
       setLocalTransaction({
-        NAME: null,
+        NAME: "",
         STATUS: true,
       });
       setEdit(false);
@@ -82,22 +82,22 @@ const CategoryForm = () => {
         ? await dispatch(putCategory(values))
         : await dispatch(postCategory(values));
 
-      if (action.payload.data.code === 200) {
+      if (action.payload.code === 200) {
         dispatch(toggleNewDialog(false));
         dispatch(getCategory());
         api.success({
-          message: "Form Submitted Successfully.",
+          message: "Category Details Saved Successfully.",
         });
-      } else if (action.payload.data.code === 304) {
-        console.info(
-          "Mobile number or Email is already in use.",
-          action.payload.error
-        );
+      } else if (action.payload.code === 304) {
+        api.error({
+          message: "Already Exists",
+          description: "Category name is already in use.",
+        });
       } else {
-        console.error(
-          "Error occurred during form submission:",
-          action.payload.error
-        );
+        api.error({
+          message: "Error",
+          description: action.payload.message || "Failed to save category details.",
+        });
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);

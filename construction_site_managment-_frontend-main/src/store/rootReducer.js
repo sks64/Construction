@@ -12,6 +12,7 @@ import { combineReducers } from "redux";
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
+    _temp: (state = {}) => state, // Added placeholder to prevent error
     ...asyncReducers,
   });
   return combinedReducer(state, action);

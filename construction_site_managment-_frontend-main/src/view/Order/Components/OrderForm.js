@@ -34,7 +34,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 
 const { Option } = Select;
 
-const DistributorForm = () => {
+const OrderForm = () => {
   const [api, contextHolder] = notification.useNotification();
   const [tableData, setTableData] = useState([]);
   const [edit, setEdit] = useState(false);
@@ -150,9 +150,20 @@ const DistributorForm = () => {
     const rowToEdit = tableData[index];
     setEditingIndex(index);
     setFieldValue("ITEM_ID", rowToEdit.itemid);
-    setFieldValue("QTY", rowToEdit.quantity); // Pre-fill quantity for editing
+    setFieldValue("QTY", rowToEdit.quantity);
     setFieldValue("RATE", rowToEdit.Rate);
-    setCurrentStock(getCurrentStock(rowToEdit.itemid)); // Get stock based on current state
+    
+    // Set category and filtered items for the edit
+    const item = itemList?.find((i) => i.ID === rowToEdit.itemid);
+    if (item) {
+      setFieldValue("CATEGORY_ID", item.CATEGORY_ID);
+      const filteredItems = itemList.filter(
+        (i) => i.CATEGORY_ID === item.CATEGORY_ID
+      );
+      setFilteredItemList(filteredItems);
+    }
+    
+    setCurrentStock(getCurrentStock(rowToEdit.itemid));
   };
 
   const handleDelete = (index) => {
@@ -171,10 +182,10 @@ const DistributorForm = () => {
 
   const handleAddOrUpdate = (values, setFieldValue) => {
     if (!values.QTY) {
-      setFieldValue("quantityError", "Quantity is required");
+      setQuantityError("Quantity is required");
       return;
     } else {
-      setFieldValue("quantityError", "");
+      setQuantityError("");
     }
 
     const item = itemList.find((item) => item.ID === values.ITEM_ID);
@@ -378,7 +389,7 @@ const DistributorForm = () => {
         ? await dispatch(putOrder(formattedData))
         : await dispatch(postOrder(formattedData));
 
-      if (action.payload.code === 200) {
+      if (action.payload && action.payload.code === 200) {
         dispatch(getOrder());
         dispatch(toggleNewDialog(false));
         api.success({
@@ -387,13 +398,14 @@ const DistributorForm = () => {
         resetForm();
         setTableData([]); // Clear the table data
       } else {
+        const errorMessage = action.payload?.message || action.payload?.error || "Failed to save order.";
         console.error(
           "Error occurred during form submission:",
-          action.payload.error
+          errorMessage
         );
         api.error({
           message: "Form Submission Error",
-          description: action.payload.error || "An unexpected error occurred.",
+          description: errorMessage,
         });
       }
     } catch (error) {
@@ -796,4 +808,4 @@ const DistributorForm = () => {
     </>
   );
 };
-export default DistributorForm;
+export default OrderForm;

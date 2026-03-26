@@ -12,13 +12,13 @@ export const getItem = createAsyncThunk("user/data/getItem", async (data) => {
 });
 export const postItem = createAsyncThunk("user/data/postItem", async (data) => {
   const response = await apipostItem(data);
-  return response;
+  return response.data;
 });
 export const putItem = createAsyncThunk(
   "user/data/updateProduct",
   async (data) => {
     const response = await apiUpdateItem(data);
-    return response;
+    return response.data;
   }
 );
 
@@ -26,7 +26,7 @@ export const getCategory = createAsyncThunk(
   "user/data/getCategory",
   async (data) => {
     const response = await apiGetAllCategory(data);
-    return response;
+    return response.data;
   }
 );
 

@@ -17,7 +17,7 @@ import { DatePicker, Space } from "antd";
 import moment from "moment";
 import { getItem, postItem, putItem, getCategory } from "../store/dataSlice";
 
-const UserForm = ({ handleRefresh }) => {
+const ItemForm = ({ handleRefresh }) => {
   const [edit, setEdit] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ const UserForm = ({ handleRefresh }) => {
 
   //console.log("selected item", selectedItem);
   const categories = useSelector(
-    (state) => state.item.data.categoryList.data?.data
+    (state) => state.item.data.categoryList?.data
   );
 
   console.log("categories", categories);
@@ -81,13 +81,13 @@ const UserForm = ({ handleRefresh }) => {
       setEdit(true);
     } else {
       setLocalTransaction({
-        NAME: null,
-        CURRENT_STOCK: null,
+        NAME: "",
+        CURRENT_STOCK: "",
         STATUS: true,
-        CATEGORY_ID: null,
-        SALE_RATE: null,
-        RENT_RATE: null,
-        GST_PERCENT: null,
+        CATEGORY_ID: "",
+        SALE_RATE: "",
+        RENT_RATE: "",
+        GST_PERCENT: "",
       });
       setEdit(false);
     }
@@ -115,22 +115,22 @@ const UserForm = ({ handleRefresh }) => {
         ? await dispatch(putItem(values))
         : await dispatch(postItem(values));
 
-      if (action.payload.data.code === 200) {
+      if (action.payload.code === 200) {
         dispatch(toggleNewDialog(false));
         dispatch(getItem());
         api.success({
-          message: "Form Submitted Successfully.",
+          message: "Item Details Saved Successfully.",
         });
-      } else if (action.payload.data.code === 304) {
-        console.info(
-          "Mobile number or Email is already in use.",
-          action.payload.error
-        );
+      } else if (action.payload.code === 304) {
+        api.error({
+          message: "Already Exists",
+          description: "Item name is already in use.",
+        });
       } else {
-        console.error(
-          "Error occurred during form submission:",
-          action.payload.error
-        );
+        api.error({
+          message: "Error",
+          description: action.payload.message || "Failed to save item details.",
+        });
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -398,4 +398,4 @@ const UserForm = ({ handleRefresh }) => {
   );
 };
 
-export default UserForm;
+export default ItemForm;

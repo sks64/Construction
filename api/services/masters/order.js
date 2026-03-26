@@ -1,4 +1,3 @@
-const { connect } = require("../../routes/global");
 const mm = require("../../utilities/globalModule");
 const logger = require("../../utilities/logger");
 const async = require("async");

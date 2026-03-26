@@ -34,17 +34,16 @@ export const postCustomer = createAsyncThunk(
   "customer/data/postCustomer",
   async (data) => {
     const response = await apipostCustomer(data);
-    return response;
+    return response.data;
   }
 );
 export const putCustomer = createAsyncThunk(
   "customer/data/updateCustomer",
   async (data) => {
     const response = await apiputCustomer(data);
-    return response;
+    return response.data;
   }
 );
-
 
 
 export const initialTableData = {

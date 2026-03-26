@@ -142,6 +142,7 @@ exports.create = (req, res) => {
   var data = reqData(req);
 
   try {
+    data.CREATED_MODIFIED_DATE = mm.getSystemDate();
     mm.executeQueryData(
       "INSERT INTO " + categoryMaster + " SET ?",
       data,
@@ -156,7 +157,8 @@ exports.create = (req, res) => {
           );
           res.send({
             code: 400,
-            message: "Failed to save categoryMaster information...",
+            message: "Failed to save categoryMaster information: " + error.sqlMessage,
+            error: error
           });
         } else {
           //console.log(results);
@@ -208,7 +210,7 @@ exports.update = (req, res) => {
           );
           res.send({
             code: 400,
-            message: "Failed to update categoryMaster information.",
+            message: "Failed to update categoryMaster information: " + (error.sqlMessage || error.message),
           });
         } else {
           //console.log(results);

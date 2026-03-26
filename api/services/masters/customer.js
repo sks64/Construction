@@ -164,9 +164,10 @@ exports.create = (req, res) => {
           if (results1.length > 0) {
             res.send({
               code: 304,
-              message: "Already exist",
+              message: "Already exists",
             });
           } else {
+            data.CREATED_MODIFIED_DATE = mm.getSystemDate();
             mm.executeQueryData(
               "INSERT INTO " + customerMaster + " SET ?",
               data,
@@ -181,7 +182,8 @@ exports.create = (req, res) => {
                   );
                   res.send({
                     code: 400,
-                    message: "Failed to save customerMaster information...",
+                    message: "Failed to save customerMaster information: " + error.sqlMessage,
+                    error: error
                   });
                 } else {
                   //console.log(results);
@@ -237,7 +239,7 @@ exports.update = (req, res) => {
           );
           res.send({
             code: 400,
-            message: "Failed to update customerMaster information.",
+            message: "Failed to update customerMaster information: " + (error.sqlMessage || error.message),
           });
         } else {
           //console.log(results);

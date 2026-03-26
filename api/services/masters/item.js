@@ -13,6 +13,7 @@ function reqData(req) {
     CATEGORY_ID: req.body.CATEGORY_ID,
     SALE_RATE: req.body.SALE_RATE,
     RENT_RATE: req.body.RENT_RATE,
+    GST_PERCENT: req.body.GST_PERCENT,
   };
   return data;
 }
@@ -149,6 +150,7 @@ exports.create = (req, res) => {
   var data = reqData(req);
 
   try {
+    data.CREATED_MODIFIED_DATE = mm.getSystemDate();
     mm.executeQueryData(
       "INSERT INTO " + itemMaster + " SET ?",
       data,
@@ -163,7 +165,8 @@ exports.create = (req, res) => {
           );
           res.send({
             code: 400,
-            message: "Failed to save itemMaster information...",
+            message: "Failed to save itemMaster information: " + error.sqlMessage,
+            error: error
           });
         } else {
           //console.log(results);
@@ -215,7 +218,7 @@ exports.update = (req, res) => {
           );
           res.send({
             code: 400,
-            message: "Failed to update itemMaster information.",
+            message: "Failed to update itemMaster information: " + (error.sqlMessage || error.message),
           });
         } else {
           //console.log(results);

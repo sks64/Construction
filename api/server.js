@@ -62,7 +62,8 @@ app.use("/", globalRoutes);
 app.use(helmet());
 app.disable("x-powered-by");
 
-app.listen(port, hostname, () => {
-  console.log("Hrms listening on", hostname, port, "!");
+// Removed hostname to allow Render to bind to any available network interface (0.0.0.0)
+app.listen(port || 10000, () => {
+  console.log("Hrms listening on port", port || 10000, "!");
   console.log("Database:", dbname);
 });

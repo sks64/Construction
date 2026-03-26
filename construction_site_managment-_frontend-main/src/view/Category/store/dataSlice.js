@@ -12,14 +12,14 @@ export const postCategory = createAsyncThunk(
   "user/data/postCategory",
   async (data) => {
     const response = await apipostCategory(data);
-    return response;
+    return response.data;
   }
 );
 export const putCategory = createAsyncThunk(
   "user/data/updateCategory",
   async (data) => {
     const response = await apiUpdateCategory(data);
-    return response;
+    return response.data;
   }
 );
 
@@ -64,10 +64,16 @@ const dataSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getCategory.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.categoryList = action.payload;
         state.tableData.total = action.payload.count;
+      })
+      .addCase(getCategory.rejected, (state) => {
+        state.loading = false;
       })
       .addCase(postCategory.fulfilled, (state, action) => {
       })

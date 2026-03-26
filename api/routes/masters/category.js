@@ -4,7 +4,7 @@ const categoryMasterService = require("../../services/masters/category");
 
 router
 
-  .get("/get", categoryMasterService.get)
+  .post("/get", categoryMasterService.get)
   .post("/create", categoryMasterService.create)
   .put("/update", categoryMasterService.update);
 

@@ -12,7 +12,6 @@ function reqData(req) {
         ORDER_ID: req.body.ORDER_ID,
         AMOUNT: req.body.AMOUNT,
         PAYMENT_DATETIME: req.body.PAYMENT_DATETIME,
-        CREATED_MODIFIED_DATE: req.body.CREATED_MODIFIED_DATE,
         REMARK: req.body.REMARK,
         CUSTOMER_ID: req.body.CUSTOMER_ID,
         PAYMENT_COLLECTED_BY: req.body.PAYMENT_COLLECTED_BY,
@@ -126,7 +125,7 @@ exports.create = (req, res) => {
                 logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                 res.send({
                     "code": 400,
-                    "message": "Failed to save orderPaymentDetails information..."
+                    "message": "Failed to save orderPaymentDetails information: " + (error.sqlMessage || error.message)
                 });
             }
             else {
@@ -185,7 +184,6 @@ exports.makePayment = (req, res) => {
 
     var data = reqData(req);
     let systemDate = mm.getSystemDate();
-    data.CREATED_MODIFIED_DATE = systemDate;
     data.PAYMENT_DATETIME = systemDate;
     data.STATUS = 1;
 
@@ -200,7 +198,7 @@ exports.makePayment = (req, res) => {
                         logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url)
                         res.send({
                             "code": 400,
-                            "message": "Failed to save orderPaymentDetails information..."
+                            "message": "Failed to save orderPaymentDetails information: " + (error.sqlMessage || error.message)
                         });
                     }
                     else {

@@ -8,6 +8,7 @@ import { MdPersonAdd } from "react-icons/md";
 import { RiCustomerService2Fill } from "react-icons/ri";
 import { Button } from "antd";
 import { getDashboardCount } from "../store/dataSlice";
+import * as XLSX from "xlsx";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,20 @@ const Dashboard = () => {
     dispatch(getDashboardCount());
   }, [dispatch]);
 
+  const exportToExcel = () => {
+    const transformedData = [
+      { Metric: "Available Items", Count: totalItems },
+      { Metric: "Available Orders", Count: totalOrders },
+      { Metric: "Employees", Count: totalEmployees },
+      { Metric: "Customers", Count: totalCustomers },
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(transformedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Overview");
+    XLSX.writeFile(wb, "Dashboard_Overview.xlsx");
+  };
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -39,9 +54,12 @@ const Dashboard = () => {
 
           <div className="flex mt-4 md:mt-0">
             <div className="flex items-center">
-              <Button className="py-4 px-6 font-medium border border-gray-300">
+              <Button
+                className="py-4 px-6 font-medium border border-gray-300 flex items-center gap-2"
+                onClick={exportToExcel}
+              >
                 <MdOutlineFileUpload />
-                <p>Export</p>
+                <span>Export</span>
               </Button>
             </div>
           </div>

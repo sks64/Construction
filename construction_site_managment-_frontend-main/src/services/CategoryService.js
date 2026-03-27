@@ -24,3 +24,12 @@ export async function apiUpdateCategory(data) {
     });
 }
 
+
+export async function apiDeleteCategory(data) {
+    return ApiService.fetchData({
+        url: "/api/category/delete",
+        method: "post",
+        data,
+    });
+}
+

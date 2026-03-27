@@ -4,6 +4,7 @@ import {
   apipostItem,
   apiUpdateItem,
   apiGetAllCategory,
+  apiDeleteItem,
 } from "../../../services/ItemService";
 
 export const getItem = createAsyncThunk("user/data/getItem", async (data) => {
@@ -18,6 +19,13 @@ export const putItem = createAsyncThunk(
   "user/data/updateProduct",
   async (data) => {
     const response = await apiUpdateItem(data);
+    return response.data;
+  }
+);
+export const deleteItem = createAsyncThunk(
+  "user/data/deleteItem",
+  async (data) => {
+    const response = await apiDeleteItem(data);
     return response.data;
   }
 );

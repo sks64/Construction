@@ -2,10 +2,11 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Button, Table, Pagination, Switch, Spin } from "antd";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { getUser, putUser } from "../store/dataSlice";
+import { getUser, putUser, deleteUser } from "../store/dataSlice";
 import { setSelectedUser, toggleNewDialog } from "../store/stateSlice";
 import { setTableData } from "../store/dataSlice";
 import { useLocation } from "react-router-dom";
+import { Modal, message } from "antd";
 
 const UserTable = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,25 @@ const UserTable = () => {
   const onEdit = async (record) => {
     dispatch(setSelectedUser(record));
     dispatch(toggleNewDialog(true));
+  };
+
+  const onDelete = async (record) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this user?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        const action = await dispatch(deleteUser({ ID: record.ID }));
+        if (action.payload.code === 200) {
+          message.success("User deleted successfully");
+          dispatch(getUser());
+        } else {
+          message.error(action.payload.message || "Failed to delete user");
+        }
+      },
+    });
   };
 
   const onSwitch = async (record) => {
@@ -66,17 +86,19 @@ const UserTable = () => {
       width: 100,
       render: (_, record) => (
         <>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
+            <span
+              onClick={() => onDelete(record)}
+              className="text-2xl text-red-500 cursor-pointer"
+            >
+              <MdDelete />
+            </span>
             <span
               onClick={() => onEdit(record)}
               className="text-2xl text-[#096CAE] cursor-pointer"
             >
               <MdEdit />
             </span>
-
-            {/* <span className="text-2xl ml-2 text-red-500 cursor-pointer">
-              <MdDelete />
-            </span> */}
           </div>
         </>
       ),

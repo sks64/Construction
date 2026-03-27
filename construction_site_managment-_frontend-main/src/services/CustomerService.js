@@ -59,7 +59,7 @@ export async function apiputCustomer(data) {
 export async function apiDeleteCustomer(data) {
   return ApiService.fetchData({
     url: "/api/customer/delete",
-    method: "delete",
+    method: "post",
     data,
   });
 }

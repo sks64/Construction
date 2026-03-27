@@ -122,15 +122,25 @@ const UserForm = ({ setDrawer2Visible }) => {
   const initialValues = {
     AMOUNT: "",
     REMARK: "",
-    CUSTOMER_ID: "",
-    REMAINING_AMOUNT:
-      selectedSecondOrder.SUB_TOTAL - selectedSecondOrder.PAID_AMOUNT,
-    ORDER_ID: [],
+    CUSTOMER_ID: selectedSecondOrder?.CUSTOMER_ID || "",
+    REMAINING_AMOUNT: selectedSecondOrder 
+      ? (selectedSecondOrder.SUB_TOTAL - selectedSecondOrder.PAID_AMOUNT) 
+      : 0,
+    ORDER_ID: selectedSecondOrder?.ID || "",
   };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    const userData = localStorage.getItem("UserData");
+    const remaining = selectedSecondOrder?.SUB_TOTAL - selectedSecondOrder?.PAID_AMOUNT;
+    if (parseFloat(values.AMOUNT) > remaining) {
+      api.error({
+        message: "Invalid Amount",
+        description: `Amount cannot exceed the remaining balance of ${remaining}`,
+      });
+      setSubmitting(false);
+      return;
+    }
 
+    const userData = localStorage.getItem("UserData");
     if (!userData) {
       console.error("No UserData found in localStorage");
       return;
@@ -145,7 +155,6 @@ const UserForm = ({ setDrawer2Visible }) => {
     }
 
     const USERId = userDetails[0]?.USER_ID;
-
     if (!USERId) {
       console.error("EMP_ID is undefined");
       return;
@@ -161,44 +170,34 @@ const UserForm = ({ setDrawer2Visible }) => {
 
       const action = await dispatch(AddPaymentDetails(formattedData));
 
-      console.log("action", action);
-
-      await dispatch(GetPaymentDetails({ ORDER_ID: [selectedSecondOrder.ID] }));
-
-      if (action.payload.code === 200) {
-        const newPayment = {
-          ...formattedData,
-          id: action.payload.id,
-        };
-
-        setPaymentDetails((prevDetails) => [...prevDetails, newPayment]);
-
+      if (action.payload && action.payload.code === 200) {
+        await dispatch(GetPaymentDetails({ ORDER_ID: [selectedSecondOrder.ID] }));
         dispatch(getOrder());
         setDrawer2Visible(false);
         api.success({
-          message: "Form Submitted Successfully.",
+          message: "Payment successful.",
         });
         resetForm();
-      } else if (action.payload.code === 304) {
+      } else if (action.payload && action.payload.code === 304) {
         api.error({
           message: "Order Not Found",
           description: "The order you are trying to access does not exist.",
         });
-      } else if (action.payload.code === 305) {
+      } else if (action.payload && action.payload.code === 305) {
         api.error({
           message: "Invalid Amount",
-          description: "The amount provided is not acceptable.",
+          description: action.payload.message || "The amount provided is not acceptable.",
         });
       } else {
         api.error({
-          message: "Form Submission Error",
-          description: action.payload.error || "An unexpected error occurred.",
+          message: "Payment Error",
+          description: action.payload?.message || action.payload?.error || "An unexpected error occurred.",
         });
       }
     } catch (error) {
       api.error({
         message: "Unexpected Error",
-        description: "An unexpected error occurred during form submission.",
+        description: "An unexpected error occurred during payment processing.",
       });
     } finally {
       setSubmitting(false);

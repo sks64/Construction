@@ -7,6 +7,7 @@ router
     .post('/get', notificationMasterService.get)
     .post('/getCustomers', notificationMasterService.getCustomers)
     .post('/create', notificationMasterService.create)
+    .post('/delete', notificationMasterService.delete)
     .put('/update', notificationMasterService.update)
 
 module.exports = router;

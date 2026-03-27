@@ -128,12 +128,11 @@ const OrderTable = () => {
           </span>
           <span
             onClick={
-              record.ORDER_TYPE === "R" && record.ORDER_STATUS !== "C"
+              record.ORDER_STATUS !== "C"
                 ? () => handleOpenDrawer(record)
                 : undefined
             }
-            className={`text-xl ${record.ORDER_TYPE === "S" ||
-              (record.ORDER_STATUS === "C" && record.ORDER_TYPE === "R")
+            className={`text-xl ${record.ORDER_STATUS === "C"
               ? "text-gray-400 cursor-not-allowed"
               : "text-[#096CAE] cursor-pointer"
               } mr-2`}

@@ -3,7 +3,7 @@ const { validationResult, body } = require("express-validator");
 const logger = require("../../utilities/logger");
 
 var orderMaster = "order_details";
-var viewOrderMaster = "view_" + orderMaster;
+var viewOrderMaster = ` (SELECT od.*, im.NAME AS ITEM_NAME FROM order_details od LEFT JOIN item_master im ON od.ITEM_ID = im.ID) AS od `;
 
 function reqData(req) {
   var data = {

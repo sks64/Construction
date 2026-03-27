@@ -2,7 +2,7 @@ const mm = require("../../utilities/globalModule");
 const logger = require("../../utilities/logger");
 const async = require("async");
 var orderMaster = "order_master";
-var viewOrderMaster = orderMaster;
+var viewOrderMaster = ` (SELECT om.*, cm.NAME AS CUSTOMER_NAME, cm.ADDRESS, cm.MOBILE_NO, um.NAME AS CREATED_BY_NAME FROM order_master om LEFT JOIN customer_master cm ON om.CUSTOMER_ID = cm.ID LEFT JOIN user_master um ON om.CREATED_BY = um.ID) AS om `;
 
 function reqData(req) {
   var data = {
@@ -617,153 +617,82 @@ exports.returnOrder = (req, res) => {
         connection,
         (error, results) => {
           if (error) {
-            //console.log(error);
             mm.rollbackConnection(connection);
-            logger.error(
-              req.url,
-              req.method,
-              JSON.stringify(error),
-              req.baseUrl + req.url
-            );
-            res.send({
-              code: 400,
-              message: "Failed to update orderMaster information.",
-            });
+            logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
+            res.send({ code: 400, message: "Failed to update orderMaster information." });
           } else {
             async.eachSeries(
               orderDetails,
               function iteratorOverElems(itemData, callback) {
                 let ITEM_ID = itemData.ITEM_ID,
                   ID = itemData.ID,
-                  RECEIVED_QTY = itemData.RECEIVED_QTY;
+                  NEW_RECEIVED_QTY = itemData.RECEIVED_QTY || 0;
+
+                // First find the old RECEIVED_QTY to calculate the increment
                 mm.executeDML(
-                  `update item_master set CURRENT_STOCK = (CURRENT_STOCK + ?) where ID = ?`,
-                  [RECEIVED_QTY, ITEM_ID],
+                  `SELECT RECEIVED_QTY FROM order_details WHERE ID = ?`,
+                  [ID],
                   connection,
-                  (error, updateStock) => {
-                    if (error) {
-                      callback(error);
-                    } else {
-                      mm.executeDML(
-                        `update order_details set RECEIVED_QTY =  ? where ID = ?`,
-                        [RECEIVED_QTY, ID],
-                        connection,
-                        (error, updateStock) => {
-                          if (error) {
-                            callback(error);
-                          } else {
+                  (error, rows) => {
+                    if (error) return callback(error);
+                    let OLD_RECEIVED_QTY = (rows.length > 0 && rows[0].RECEIVED_QTY) || 0;
+                    let increment = NEW_RECEIVED_QTY - OLD_RECEIVED_QTY;
+
+                    if (increment === 0) return callback(); // No change in this item
+
+                    mm.executeDML(
+                      `UPDATE item_master SET CURRENT_STOCK = (CURRENT_STOCK + ?) WHERE ID = ?`,
+                      [increment, ITEM_ID],
+                      connection,
+                      (error, updateStock) => {
+                        if (error) return callback(error);
+                        mm.executeDML(
+                          `UPDATE order_details SET RECEIVED_QTY = ? WHERE ID = ?`,
+                          [NEW_RECEIVED_QTY, ID],
+                          connection,
+                          (error, updateDetails) => {
+                            if (error) return callback(error);
                             callback();
                           }
-                        }
-                      );
-                    }
+                        );
+                      }
+                    );
                   }
                 );
               },
               function subCb(error) {
                 if (error) {
-                  //rollback
                   mm.rollbackConnection(connection);
-                  res.send({
-                    code: 400,
-                    message: "Failed to update stock details...",
-                  });
+                  res.send({ code: 400, message: "Failed to update return details: " + error.message });
                 } else {
-                  let recordData = [];
-                  var ORDER_STATUS = "C";
-                  for (let i = 0; i < orderDetails.length; i++) {
-                    var rec = [
-                      criteria.ID,
-                      orderDetails[i].ITEM_ID,
-                      orderDetails[i].QTY,
-                      orderDetails[i].RECEIVED_QTY,
-                      systemDate,
-                      orderDetails[i].RATE,
-                      orderDetails[i].QTY > orderDetails[i].RECEIVED_QTY
-                        ? "PR"
-                        : "R",
-                    ];
-                    recordData.push(rec);
-                    if (orderDetails[i].QTY > orderDetails[i].RECEIVED_QTY) {
-                      ORDER_STATUS = "PR";
-                    }
-                  }
+                  // After all items updated, check for final ORDER_STATUS
                   mm.executeDML(
-                    `update order_master set ORDER_STATUS = ? where ID = ?`,
-                    [ORDER_STATUS, criteria.ID],
+                    `SELECT QTY, RECEIVED_QTY FROM order_details WHERE ORDER_ID = ?`,
+                    [criteria.ID],
                     connection,
-                    (error, updateOrder) => {
+                    (error, finalDetails) => {
                       if (error) {
-                        //console.log(error);
                         mm.rollbackConnection(connection);
-                        logger.error(
-                          req.url,
-                          req.method,
-                          JSON.stringify(error),
-                          req.baseUrl + req.url
-                        );
-                        res.send({
-                          code: 400,
-                          message:
-                            "Failed to update order status information...",
-                        });
+                        res.send({ code: 400, message: "Failed to fetch final details." });
                       } else {
+                        let finalStatus = "C"; // Completed
+                        for (let item of finalDetails) {
+                          if (item.QTY > (item.RECEIVED_QTY || 0)) {
+                            finalStatus = "PR"; // Partially Returned
+                            break;
+                          }
+                        }
                         mm.executeDML(
-                          `delete from order_details where ORDER_ID = ?; insert into order_details(ORDER_ID, ITEM_ID, QTY, RECEIVED_QTY, CREATED_MODIFIED_DATE, RATE, RETURN_STATUS) values ?`,
-                          [criteria.ID, recordData],
+                          `UPDATE order_master SET ORDER_STATUS = ? WHERE ID = ?`,
+                          [finalStatus, criteria.ID],
                           connection,
-                          (error, insertDetails) => {
+                          (error) => {
                             if (error) {
-                              //console.log(error);
                               mm.rollbackConnection(connection);
-                              logger.error(
-                                req.url,
-                                req.method,
-                                JSON.stringify(error),
-                                req.baseUrl + req.url
-                              );
-                              res.send({
-                                code: 400,
-                                message:
-                                  "Failed to save orderDetails information...",
-                              });
+                              res.send({ code: 400, message: "Failed to update final status." });
                             } else {
-                              async.eachSeries(
-                                orderDetails,
-                                function iteratorOverElems(itemData, callback) {
-                                  let ITEM_ID = itemData.ITEM_ID,
-                                    QTY = itemData.QTY;
-                                  mm.executeDML(
-                                    `update item_master set CURRENT_STOCK = (CURRENT_STOCK - ?) where ID = ?`,
-                                    [QTY, ITEM_ID],
-                                    connection,
-                                    (error, updateStock) => {
-                                      if (error) {
-                                        callback(error);
-                                      } else {
-                                        callback();
-                                      }
-                                    }
-                                  );
-                                },
-                                function subCb(error) {
-                                  if (error) {
-                                    mm.rollbackConnection(connection);
-                                    res.send({
-                                      code: 400,
-                                      message:
-                                        "Failed to update stock details...",
-                                    });
-                                  } else {
-                                    mm.commitConnection(connection);
-                                    res.send({
-                                      code: 200,
-                                      message:
-                                        "orderMaster information saved successfully...",
-                                    });
-                                  }
-                                }
-                              );
+                              mm.commitConnection(connection);
+                              res.send({ code: 200, message: "Return processed successfully." });
                             }
                           }
                         );

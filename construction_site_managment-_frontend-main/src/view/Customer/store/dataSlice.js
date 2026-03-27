@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiGetAllCustomer, apipostCustomer, apiputCustomer,apiGetAllOrder,apiGetPaymentDetails ,apiGetAddPaymentDetails} from "../../../services/CustomerService";
-//  import { apiGetAddPaymentDetails } from "../../../services/OrderService";
+import { apiGetAllCustomer, apipostCustomer, apiputCustomer,apiGetAllOrder,apiGetPaymentDetails ,apiGetAddPaymentDetails, apiDeleteCustomer} from "../../../services/CustomerService";
 
 export const getCustomer = createAsyncThunk(
   "customer/data/getCustomer",
@@ -41,6 +40,13 @@ export const putCustomer = createAsyncThunk(
   "customer/data/updateCustomer",
   async (data) => {
     const response = await apiputCustomer(data);
+    return response.data;
+  }
+);
+export const deleteCustomer = createAsyncThunk(
+  "customer/data/deleteCustomer",
+  async (data) => {
+    const response = await apiDeleteCustomer(data);
     return response.data;
   }
 );

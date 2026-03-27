@@ -239,3 +239,31 @@ exports.update = (req, res) => {
     );
   }
 };
+
+exports.delete = (req, res) => {
+  var criteria = {
+    ID: req.body.ID,
+  };
+  try {
+    mm.executeQueryData(
+      "DELETE FROM item_master WHERE ID = ?",
+      [criteria.ID],
+      (error, results) => {
+        if (error) {
+          logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
+          res.send({
+            code: 400,
+            message: "Failed to delete item: " + (error.sqlMessage || error.message),
+          });
+        } else {
+          res.send({
+            code: 200,
+            message: "Item deleted successfully.",
+          });
+        }
+      }
+    );
+  } catch (error) {
+    logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
+  }
+};

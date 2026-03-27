@@ -6,6 +6,7 @@ router
 
     .post('/get', itemMasterService.get)
     .post('/create', itemMasterService.create)
+    .post('/delete', itemMasterService.delete)
     .put('/update', itemMasterService.update)
 
 module.exports = router;

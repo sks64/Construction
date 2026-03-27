@@ -231,3 +231,31 @@ exports.update = (req, res) => {
     );
   }
 };
+
+exports.delete = (req, res) => {
+  var criteria = {
+    ID: req.body.ID,
+  };
+  try {
+    mm.executeQueryData(
+      "DELETE FROM " + categoryMaster + " WHERE ID = ?",
+      [criteria.ID],
+      (error, results) => {
+        if (error) {
+          logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
+          res.send({
+            code: 400,
+            message: "Failed to delete category: " + (error.sqlMessage || error.message),
+          });
+        } else {
+          res.send({
+            code: 200,
+            message: "Category deleted successfully.",
+          });
+        }
+      }
+    );
+  } catch (error) {
+    logger.error(req.url, req.method, JSON.stringify(error), req.baseUrl + req.url);
+  }
+};

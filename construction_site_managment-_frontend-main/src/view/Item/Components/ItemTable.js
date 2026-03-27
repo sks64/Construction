@@ -2,22 +2,41 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Button, Table, Pagination, Switch, Spin } from "antd";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { getItem, putItem } from "../store/dataSlice";
+import { getItem, putItem, deleteItem } from "../store/dataSlice";
 import { setSelectedItem, toggleNewDialog } from "../store/stateSlice";
 import { setTableData } from "../store/dataSlice";
 import { useLocation } from "react-router-dom";
+import { Modal, message } from "antd";
 
 const ItemTable = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const data = useSelector((state) => state?.item.data.itemList?.data);
 
-  console.log("data from item table", data);
   const loading = useSelector((state) => state.item.data.loading);
 
   const onEdit = async (record) => {
     dispatch(setSelectedItem(record));
     dispatch(toggleNewDialog(true));
+  };
+
+  const onDelete = async (record) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this item?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        const action = await dispatch(deleteItem({ ID: record.ID }));
+        if (action.payload.code === 200) {
+          message.success("Item deleted successfully");
+          dispatch(getItem());
+        } else {
+          message.error(action.payload.message || "Failed to delete item");
+        }
+      },
+    });
   };
 
   let togglePromise = null;
@@ -65,17 +84,19 @@ const ItemTable = () => {
       width: 100,
       render: (_, record) => (
         <>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
+            <span
+              onClick={() => onDelete(record)}
+              className="text-2xl text-red-500 cursor-pointer"
+            >
+              <MdDelete />
+            </span>
             <span
               onClick={() => onEdit(record)}
               className="text-2xl text-[#096CAE] cursor-pointer"
             >
               <MdEdit />
             </span>
-
-            {/* <span className="text-2xl ml-2 text-red-500 cursor-pointer">
-              <MdDelete />
-            </span> */}
           </div>
         </>
       ),

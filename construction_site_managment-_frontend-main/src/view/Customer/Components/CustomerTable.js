@@ -1,13 +1,14 @@
 import React, { useEffect, useCallback } from "react";
 import { Button, Table, Switch, Spin } from "antd";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdDelete } from "react-icons/md";
 import { PiContactlessPaymentBold } from "react-icons/pi";
 import { useSelector, useDispatch } from "react-redux";
-import { getCustomer, putCustomer } from "../store/dataSlice";
+import { getCustomer, putCustomer, deleteCustomer } from "../store/dataSlice";
 import { setSelectedCustomer, toggleNewDialog } from "../store/stateSlice";
 import { setTableData } from "../store/dataSlice";
 import { setSelectedOrder, togglefourthDialog } from "../store/stateSlice";
 import { useLocation } from "react-router-dom";
+import { Modal, message } from "antd";
 
 const UserTable = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,25 @@ const UserTable = () => {
   const onEdit = (record) => {
     dispatch(setSelectedCustomer(record));
     dispatch(toggleNewDialog(true));
+  };
+
+  const onDelete = async (record) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this customer?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        const action = await dispatch(deleteCustomer({ ID: record.ID }));
+        if (action.payload.code === 200) {
+          message.success("Customer deleted successfully");
+          dispatch(getCustomer());
+        } else {
+          message.error(action.payload.message || "Failed to delete customer");
+        }
+      },
+    });
   };
 
   const onSwitch = async (record) => {
@@ -71,9 +91,15 @@ const UserTable = () => {
       title: <span className="text-gray-500">Action</span>,
       dataIndex: "action",
       fixed: "left",
-      width: 100,
+      width: 120,
       render: (_, record) => (
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          <span
+            onClick={() => onDelete(record)}
+            className="text-2xl text-red-500 cursor-pointer"
+          >
+            <MdDelete />
+          </span>
           <span
             onClick={() => onEdit(record)}
             className="text-2xl text-[#096CAE] cursor-pointer"
@@ -82,7 +108,7 @@ const UserTable = () => {
           </span>
           <span
             onClick={() => onTransaction(record)}
-            className="text-xl text-[#096CAE] cursor-pointer ml-2"
+            className="text-xl text-[#096CAE] cursor-pointer"
           >
             <PiContactlessPaymentBold />
           </span>

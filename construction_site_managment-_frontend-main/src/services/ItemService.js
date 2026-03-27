@@ -38,11 +38,10 @@ export async function apiUpdateItem(data) {
     data,
   });
 }
-
-// export async function apiDeleteUser(data) {
-//     return ApiService.fetchData({
-//         url: "/api/user/delete",
-//         method: "delete",
-//         data,
-//     });
-// }
+export async function apiDeleteItem(data) {
+  return ApiService.fetchData({
+    url: "/api/item/delete",
+    method: "post",
+    data,
+  });
+}

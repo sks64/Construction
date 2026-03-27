@@ -14,7 +14,7 @@ const GSTInvoice = () => {
   console.log(itemdata);
 
   useEffect(() => {
-    if (itemdata.length === 0) {
+    if (itemdata && itemdata.length === 0) {
       dispatch(getItem());
     }
   }, [dispatch, itemdata]);
@@ -23,13 +23,13 @@ const GSTInvoice = () => {
 
   const total23 = invoiceData2?.reduce((acc, item) => {
     return acc + (item?.QTY * item?.RATE || 0);
-  }, 0);
+  }, 0) || 0;
 
-  const gstPercentage = Array.isArray(itemdata)
+  const gstPercentage = invoiceData2 && invoiceData2.length > 0 && Array.isArray(itemdata)
   ? itemdata.find(i => i.ID === invoiceData2[0]?.ITEM_ID)?.GST_PERCENT || 0
   : 0;
 
-  const totalGstAmount = invoiceData2.reduce((total, item) => {
+  const totalGstAmount = (invoiceData2 || []).reduce((total, item) => {
     const itemTotal = item?.QTY * item?.RATE || 0;
     const matchingItem = Array.isArray(itemdata)
       ? itemdata.find(i => i.ID === item?.ITEM_ID)
@@ -39,7 +39,7 @@ const GSTInvoice = () => {
     return total + gstItemAmount;
   }, 0);
   
-  const totalAmountWithoutGst = invoiceData2.reduce((total, item) => {
+  const totalAmountWithoutGst = (invoiceData2 || []).reduce((total, item) => {
     return total + (item?.QTY * item?.RATE || 0);
   }, 0);
   
@@ -165,6 +165,10 @@ const GSTInvoice = () => {
     },
   };
 
+  if (!invoiceData) {
+    return <div className="p-4 text-center">No order selected for invoice.</div>;
+  }
+
   return (
     <div>
       {loading ? (
@@ -210,7 +214,7 @@ const GSTInvoice = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoiceData2.map((item, index) => {
+                  {invoiceData2 && invoiceData2.map((item, index) => {
                     const itemTotal = item?.QTY * item?.RATE || 0;
                     const matchingItem = Array.isArray(itemdata)
                         ? itemdata.find(i => i.ID === item?.ITEM_ID)

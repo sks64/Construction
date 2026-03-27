@@ -6,6 +6,7 @@ router
 
   .post("/get", categoryMasterService.get)
   .post("/create", categoryMasterService.create)
+  .post("/delete", categoryMasterService.delete)
   .put("/update", categoryMasterService.update);
 
 module.exports = router;

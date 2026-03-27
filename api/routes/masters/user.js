@@ -5,6 +5,7 @@ const userMasterService = require('../../services/masters/user');
 router
     .post('/get', userMasterService.get)
     .post('/create', userMasterService.create)
+    .post('/delete', userMasterService.delete)
     .put('/update', userMasterService.update)
     .post('/createUser', userMasterService.createUser)
     .post('/changePassword', userMasterService.changePassword)

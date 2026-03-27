@@ -156,7 +156,7 @@ const OrderReturn = ({ setDrawerVisible, onResetInnerTableData, values }) => {
     if (orderDetailsList) {
       const initialRates = orderDetailsList.reduce((acc, item) => {
         acc[item.ID] =
-          item.RECEIVED_QTY !== null ? item.RECEIVED_QTY : item.QTY;
+          item.RECEIVED_QTY !== null ? item.RECEIVED_QTY : 0;
         return acc;
       }, {});
       setRates(initialRates);
@@ -271,7 +271,7 @@ const OrderReturn = ({ setDrawerVisible, onResetInnerTableData, values }) => {
 
     let calculatedSubtotal = orderAmount + fineAmount;
 
-    const subtotalWithDues = orderDetailsList.forEach((item) => {
+    orderDetailsList.forEach((item) => {
       calculatedSubtotal += item.RATE * item.QTY * multiplier;
     });
 
@@ -279,12 +279,12 @@ const OrderReturn = ({ setDrawerVisible, onResetInnerTableData, values }) => {
       const formattedData = {
         ...values,
         CREATED_BY: USERId,
-        SUB_TOTAL: subtotalWithDues,
+        SUB_TOTAL: calculatedSubtotal,
         orderDetails: orderreturnTableData.map((item) => ({
           ID: item.id,
           ITEM_ID: item.itemid,
           QTY: item.quantity,
-          RECEIVED_QTY: rates[item.id] || item.QTY,
+          RECEIVED_QTY: rates[item.id] !== undefined ? rates[item.id] : (item.ReceivedQuantity || 0),
           RATE: item.rate,
         })),
       };

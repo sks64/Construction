@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiGetAllUser, apipostUser, apiUpdateUser } from "../../../services/UserServices";
+import { apiGetAllUser, apipostUser, apiUpdateUser, apiDeleteUser } from "../../../services/UserServices";
 
 export const getUser = createAsyncThunk(
   "user/data/getUser",
@@ -20,6 +20,13 @@ export const putUser = createAsyncThunk(
   async (data) => {
     const response = await apiUpdateUser(data);
     return response;
+  }
+);
+export const deleteUser = createAsyncThunk(
+  "user/data/deleteUser",
+  async (data) => {
+    const response = await apiDeleteUser(data);
+    return response.data;
   }
 );
 

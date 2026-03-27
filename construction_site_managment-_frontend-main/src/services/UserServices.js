@@ -39,7 +39,7 @@ export async function apiUpdateUser(data) {
 export async function apiDeleteUser(data) {
     return ApiService.fetchData({
         url: "/api/user/delete",
-        method: "delete",
+        method: "post",
         data,
     });
 }
